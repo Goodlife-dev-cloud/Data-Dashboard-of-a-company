@@ -1,1 +1,50 @@
+## Analyzing the data of sales of particular company
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import statsmodels.api as sm
+import seaborn as sn
+# Navigating through the data
+data = pd.read_csv("N Sales.csv",sep="\t")
+display(data.head())
 
+data.describe()
+data.info()
+data.isnull().sum()
+### What is the Highest And Lowest Product?
+# Changing the str into an int for calculation
+data.columns = data.columns.str.strip()
+data["Total Sale"] = data["Total Sale"].replace(to_replace=r'\$', value='',regex=True)
+
+data["Total Sale"] = data["Total Sale"].replace(to_replace=',', value = '', regex=True)
+data["Total Sale"] = data["Total Sale"] = pd.to_numeric(data["Total Sale"], errors = "coerce").fillna(0)
+
+# Finding the sum of the Total sale to differentiate between high and low product
+highest_product = data.groupby("Product")["Total Sale"].sum().astype(int)
+display(pd.DataFrame(highest_product))
+
+# Creating a visual aid of the data
+highest_product.plot(kind="bar")
+plt.xticks(rotation=45)
+plt.title("What is the Performing Product?",family="Algerian",
+          fontsize=20,
+          color="blue")
+plt.show()
+
+
+#
+### What is the performing product in each regions?
+
+high_region = data.groupby(["State","Product"])["Total Sale"].sum().reset_index()
+display(pd.DataFrame(high_region))
+
+# Creating a visual aid of the data
+
+plt.figure(figsize=(15,10))
+sn.barplot(data=high_region, x="State", y ="Total Sale",hue="Product")
+plt.xticks(rotation=90)
+plt.title("Which is The Performing Product in each State?",family= "Algerian",
+          fontsize=20,
+          color="blue")
+plt.show()
+### What is the revenue of each Product?
